@@ -176,10 +176,10 @@ Value stop(const Array& params, bool fHelp)
     if (fHelp || params.size() > 1)
         throw runtime_error(
             "stop\n"
-            "Stop Zetacoin server.");
+            "Stop vcoin server.");
     // Shutdown will take long enough that the response should get back
     StartShutdown();
-    return "Zetacoin server stopping";
+    return "vcoin server stopping";
 }
 
 Value makekeypair(const Array& params, bool fHelp)
@@ -323,7 +323,7 @@ string HTTPPost(const string& strMsg, const map<string,string>& mapRequestHeader
 {
     ostringstream s;
     s << "POST / HTTP/1.1\r\n"
-      << "User-Agent: zetacoin-json-rpc/" << FormatFullVersion() << "\r\n"
+      << "User-Agent: vcoin-json-rpc/" << FormatFullVersion() << "\r\n"
       << "Host: 127.0.0.1\r\n"
       << "Content-Type: application/json\r\n"
       << "Content-Length: " << strMsg.size() << "\r\n"
@@ -354,7 +354,7 @@ static string HTTPReply(int nStatus, const string& strMsg, bool keepalive)
     if (nStatus == HTTP_UNAUTHORIZED)
         return strprintf("HTTP/1.0 401 Authorization Required\r\n"
             "Date: %s\r\n"
-            "Server: zetacoin-json-rpc/%s\r\n"
+            "Server: vcoin-json-rpc/%s\r\n"
             "WWW-Authenticate: Basic realm=\"jsonrpc\"\r\n"
             "Content-Type: text/html\r\n"
             "Content-Length: 296\r\n"
@@ -381,7 +381,7 @@ static string HTTPReply(int nStatus, const string& strMsg, bool keepalive)
             "Connection: %s\r\n"
             "Content-Length: %"PRIszu"\r\n"
             "Content-Type: application/json\r\n"
-            "Server: zetacoin-json-rpc/%s\r\n"
+            "Server: vcoin-json-rpc/%s\r\n"
             "\r\n"
             "%s",
         nStatus,
@@ -512,7 +512,7 @@ bool HTTPAuthorized(map<string, string>& mapHeaders)
 }
 
 //
-// JSON-RPC protocol.  Zetacoin speaks version 1.0 for maximum compatibility,
+// JSON-RPC protocol.  vcoin speaks version 1.0 for maximum compatibility,
 // but uses JSON-RPC 1.1/2.0 standards for parts of the 1.0 standard that were
 // unspecified (HTTP errors and contents of 'error').
 //
@@ -761,7 +761,7 @@ void StartRPCThreads()
     {
         unsigned char rand_pwd[32];
         RAND_bytes(rand_pwd, 32);
-        string strWhatAmI = "To use zetacoind";
+        string strWhatAmI = "To use vcoind";
         if (mapArgs.count("-server"))
             strWhatAmI = strprintf(_("To use the %s option"), "\"-server\"");
         else if (mapArgs.count("-daemon"))
@@ -770,13 +770,13 @@ void StartRPCThreads()
             _("%s, you must set a rpcpassword in the configuration file:\n"
               "%s\n"
               "It is recommended you use the following random password:\n"
-              "rpcuser=zetacoinrpc\n"
+              "rpcuser=vcoinrpc\n"
               "rpcpassword=%s\n"
               "(you do not need to remember this password)\n"
               "The username and password MUST NOT be the same.\n"
               "If the file does not exist, create it with owner-readable-only file permissions.\n"
               "It is also recommended to set alertnotify so you are notified of problems;\n"
-              "for example: alertnotify=echo %%s | mail -s \"Zetacoin Alert\" admin@foo.com\n"),
+              "for example: alertnotify=echo %%s | mail -s \"vcoin Alert\" admin@foo.com\n"),
                 strWhatAmI.c_str(),
                 GetConfigFile().string().c_str(),
                 EncodeBase58(&rand_pwd[0],&rand_pwd[0]+32).c_str()),
@@ -889,6 +889,20 @@ void RPCRunHandler(const boost::system::error_code& err, boost::function<void(vo
     if (!err)
         func();
 }
+
+void RPCRunLater(const std::string& name, boost::function<void(void)> func, int64 nSeconds)
+{
+    assert(rpc_io_service != NULL);
+
+    if (deadlineTimers.count(name) == 0)
+    {
+        deadlineTimers.insert(make_pair(name,
+                                        boost::shared_ptr<deadline_timer>(new deadline_timer(*rpc_io_service))));
+    }
+    deadlineTimers[name]->expires_from_now(posix_time::seconds(nSeconds));
+    deadlineTimers[name]->async_wait(boost::bind(RPCRunHandler, _1, func));
+}
+
 
 class JSONRequest
 {

@@ -105,10 +105,10 @@ OBJS= \
     obj/chainparams.o
 
 
-all: zetacoind.exe
+all: vcoind.exe
 
-test check: test_zetacoin.exe FORCE
-	test_zetacoin.exe
+test check: test_vcoin.exe FORCE
+	test_vcoin.exe
 
 #
 # LevelDB support
@@ -122,7 +122,7 @@ leveldb/libleveldb.a:
 obj/%.o: %.cpp $(HEADERS)
 	$(CXX) -c $(CFLAGS) -o $@ $<
 
-zetacoind.exe: $(OBJS:obj/%=obj/%)
+vcoind.exe: $(OBJS:obj/%=obj/%)
 	$(CXX) $(CFLAGS) $(LDFLAGS) -o $@ $(LIBPATHS) $^ $(LIBS)
 
 TESTOBJS := $(patsubst test/%.cpp,obj-test/%.o,$(wildcard test/*.cpp))
@@ -130,11 +130,11 @@ TESTOBJS := $(patsubst test/%.cpp,obj-test/%.o,$(wildcard test/*.cpp))
 obj-test/%.o: test/%.cpp $(HEADERS)
 	$(CXX) -c $(TESTDEFS) $(CFLAGS) -o $@ $<
 
-test_zetacoin.exe: $(TESTOBJS) $(filter-out obj/init.o obj/zetacoind.o,$(OBJS:obj/%=obj/%))
+test_vcoin.exe: $(TESTOBJS) $(filter-out obj/init.o obj/vcoind.o,$(OBJS:obj/%=obj/%))
 	$(CXX) $(CFLAGS) $(LDFLAGS) -o $@ $(LIBPATHS) $^ -lboost_unit_test_framework$(BOOST_SUFFIX) $(LIBS)
 
 clean:
-	rm -f zetacoind.exe test_zetacoin.exe
+	rm -f vcoind.exe test_vcoin.exe
 	rm -f obj/*
 	rm -f obj-test/*
 	cd leveldb && $(MAKE) TARGET_OS=NATIVE_WINDOWS clean && cd ..

@@ -20,14 +20,14 @@ BEGIN
     BEGIN
         BLOCK "040904E4" // U.S. English - multilingual (hex)
         BEGIN
-            VALUE "CompanyName",        "Zetacoin"
-            VALUE "FileDescription",    "Zetacoin-Qt (OSS GUI client for Bitcoin)"
+            VALUE "CompanyName",        "VCoin"
+            VALUE "FileDescription",    "VCoin-Qt (OSS GUI client for Bitcoin)"
             VALUE "FileVersion",        VER_FILEVERSION_STR
-            VALUE "InternalName",       "zetacoin-qt"
+            VALUE "InternalName",       "vcoin-qt"
             VALUE "LegalCopyright",     COPYRIGHT_STR
             VALUE "LegalTrademarks1",   "Distributed under the MIT/X11 software license, see the accompanying file COPYING or http://www.opensource.org/licenses/mit-license.php."
-            VALUE "OriginalFilename",   "zetacoin-qt.exe"
-            VALUE "ProductName",        "Zetacoin-Qt"
+            VALUE "OriginalFilename",   "vcoin-qt.exe"
+            VALUE "ProductName",        "VCoin-Qt"
             VALUE "ProductVersion",     VER_PRODUCTVERSION_STR
         END
     END
