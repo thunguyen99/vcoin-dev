@@ -1359,11 +1359,12 @@ Value walletpassphrase(const Array& params, bool fHelp)
     pwalletMain->TopUpKeyPool();
 
     NewThread(ThreadTopUpKeyPool, NULL);
-    int64* pnSleepTime = new int64(params[1].get_int64());
+    int64* nSleepTime = new int64(params[1].get_int64());
+    // FIXME: check which is more recent/robust approach
+    // int64* pnSleepTime = new int64(params[1].get_int64());
+    // NewThread(ThreadCleanWalletPassphrase, pnSleepTime);
     LOCK(cs_nWalletUnlockTime);
     nWalletUnlockTime = GetTime() + nSleepTime;
-    // FIXME: check alternatives
-    // NewThread(ThreadCleanWalletPassphrase, pnSleepTime);
     RPCRunLater("lockwallet", boost::bind(LockWallet, pwalletMain), nSleepTime);
 
     return Value::null;
